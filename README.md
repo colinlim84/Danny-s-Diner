@@ -8,7 +8,7 @@ Danny wants to use the data to answer a few simple questions about his customers
 
 ````sql
 SELECT 
-	customer_id,
+    customer_id,
     SUM(price) total_price
 FROM dannys_diner.sales s
 JOIN dannys_diner.menu m
@@ -22,7 +22,7 @@ ORDER BY 2 DESC
 
 ````sql
 SELECT
-	customer_id, 
+    customer_id, 
     COUNT(DISTINCT TO_CHAR(order_date, 'dd-mm-yy')) order_date
 FROM dannys_diner.sales
 GROUP BY 1
@@ -35,7 +35,7 @@ ORDER BY 2 DESC
 
 ````sql
 SELECT DISTINCT
-	customer_id,
+    customer_id,
     product_name
 FROM
   (SELECT 
@@ -52,7 +52,49 @@ WHERE drk=1
 
 
 -- 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
+````sql
+SELECT 
+      product_name,
+      num_of_time_purchased
+FROM
+  (SELECT 
+      product_id,
+      COUNT(*) num_of_time_purchased,
+      DENSE_RANK() OVER (ORDER BY COUNT(*) DESC) drk
+  FROM dannys_diner.sales
+  GROUP BY 1) a
+JOIN dannys_diner.menu
+USING(product_id)
+WHERE drk=1
+````
+
+
 -- 5. Which item was the most popular for each customer?
+````sql
+WITH popular_item AS (
+SELECT
+      customer_id,
+      product_id,
+      COUNT(*) num_of_times_ordered,
+      DENSE_RANK() OVER(PARTITION BY customer_id ORDER BY COUNT(*) DESC) drk
+FROM dannys_diner.sales
+GROUP BY 1,2)
+
+
+SELECT 
+    p.customer_id, 
+    m.product_name,
+    p.num_of_times_ordered
+FROM popular_item p
+JOIN dannys_diner.menu m
+USING(product_id)
+WHERE drk=1
+ORDER BY 1,2
+````
+
+
+
+
 -- 6. Which item was purchased first by the customer after they became a member?
 -- 7. Which item was purchased just before the customer became a member?
 -- 8. What is the total items and amount spent for each member before they became a member?
