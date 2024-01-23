@@ -96,6 +96,29 @@ ORDER BY 1,2
 
 
 -- 6. Which item was purchased first by the customer after they became a member?
+
+````sql
+WITH item_first_order AS (
+SELECT 
+	mem.*,
+    s.order_date,
+    s.product_id,
+    m.product_name,
+    DENSE_RANK() OVER(PARTITION BY mem.customer_id ORDER BY s.order_date) drk
+FROM dannys_diner.members mem
+JOIN dannys_diner.sales s ON mem.customer_id=s.customer_id AND mem.join_date<s.order_date
+JOIN dannys_diner.menu m ON s.product_id=m.product_id)
+
+SELECT 
+	customer_id,
+    product_name
+FROM item_first_order
+WHERE drk=1
+````
+
+
+
+
 -- 7. Which item was purchased just before the customer became a member?
 -- 8. What is the total items and amount spent for each member before they became a member?
 -- 9.  If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
