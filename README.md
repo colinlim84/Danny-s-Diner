@@ -65,7 +65,22 @@ GROUP BY 1
 ORDER BY 2 DESC
 ````
 
+#### Steps:
+- Use **TO_CHAR** to convert `order_date` from Timestamp to Date.
+- Use **COUNT** with **DISTINCT** to compute unique number of day.
+- Group the aggregated results by `sales.customer_id`. 
 
+#### Answer:
+| customer_id | visit_count |
+| ----------- | ----------- |
+| B           | 6          |
+| A           | 4          |
+| C           | 2          |
+
+>[!NOTE]
+>I've seen solutions that reached the same result without converting `order_date` to Date format. It would also work because all time values are set to 0 in the data, I chose to add the extra step to be more careful to avoid unexpectedly double same day visit more than once.
+
+***
 
 > 3. What was the first item from the menu purchased by each customer?
 
@@ -84,6 +99,27 @@ FROM
   USING(product_id)) base
 WHERE drk=1
 ````
+
+#### Steps:
+- Use **JOIN** to merge `dannys_diner.sales` and `dannys_diner.menu` tables as the required information `sales.customer_id`, `sales.order_date` and `menu.price` are from both tables.
+- Use **DENSE_RANK** to determine order of purchase :  **PARTITION BY customer_id** tells the code to re-starts ranking whenever `customer_id` changes, while **ORDER BY order_date** orders the rows within individual partition by `order_date`.
+- Wrap the above query with brackets and make it a Sub-query, alias it **base**.
+- In the outer query, **SELECT DISTINCT** `customer_id` and `product_name` to avoid getting duplicated result if customers ordered 2 of the same item on their first visit.
+- Use **WHERE** to filter **drk=1** to obtain only the 1st in rank for each customer.
+
+#### Answer:
+| customer_id | product_name | 
+| ----------- | ----------- |
+| A           | curry        | 
+| A           | sushi        | 
+| B           | curry        | 
+| C           | ramen        |
+
+
+>[!Tip]
+>**DENSE_RANK** is used instead of **RANK**, so that if customers purchased different items on their first visit, we would get the all that was purchased on that day.
+>
+***
 
 
 
