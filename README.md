@@ -250,6 +250,23 @@ FROM item_ordered_before_membership
 WHERE drk=1
 ````
 
+#### Steps:
+- Create a **CTE** name `item_ordered_before_membership`.
+- Within the CTE, use **JOIN** to merge `dannys_diner.members`, `dannys_diner.sales` and `dannys_diner.menu` to get all the required fields.
+- While merging `dannys_diner.sales`, use **AND mem.join_date>s.order_date** to merge only order before `join_date`.
+- Use **DENSE_RANK** to sequence of purchase, use **ORDER BY s.order_dat** order the ranking starting with latest  `order_date`.
+- In the outer query, filter **drk=1** to obtain only the item(s) purchased by the customer just before became a member.
+
+#### Answer:
+| customer_id | order_date               | product_name |
+| ----------- | ------------------------ | ------------ |
+| A           | 2021-01-01T00:00:00.000Z | sushi        |
+| A           | 2021-01-01T00:00:00.000Z | curry        |
+| B           | 2021-01-04T00:00:00.000Z | sushi        |
+
+***
+
+
 > 8. What is the total items and amount spent for each member before they became a member?
 
 ````sql
