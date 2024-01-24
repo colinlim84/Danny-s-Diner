@@ -190,9 +190,6 @@ ORDER BY 1,2
 | B           | ramen        |  2   |
 | C           | ramen        |  3   |
 
-- Ohhhh.. seems like everyone loves ramen, and Customer B appears to be in love with everything that Danny serve
-
-
 > 6. Which item was purchased first by the customer after they became a member?
 
 ````sql
@@ -208,13 +205,24 @@ JOIN dannys_diner.sales s ON mem.customer_id=s.customer_id AND mem.join_date<s.o
 JOIN dannys_diner.menu m ON s.product_id=m.product_id)
 
 SELECT 
-	customer_id,
+    customer_id,
     product_name
 FROM item_first_order
 WHERE drk=1
 ````
 
+#### Steps:
+- Create a **CTE** name `item_first_order`.
+- Within the CTE, use **JOIN** to merge `dannys_diner.members`, `dannys_diner.sales` and `dannys_diner.menu` to get all the required fields.
+- While merging `dannys_diner.sales`, use **AND mem.join_date<s.order_date** to merge only order after `join_date`.
+- Use **DENSE_RANK** to sequence of purchase.
+- In the outer query, filter **drk=1** to obtain only the item(s) first purchased by the customer after they became a member.
 
+#### Answer:
+| customer_id | product_name |
+| ----------- | ---------- |
+| A           | ramen        |
+| B           | sushi        |
 
 
 > 7. Which item was purchased just before the customer became a member?
