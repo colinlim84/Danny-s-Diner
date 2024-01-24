@@ -118,10 +118,8 @@ WHERE drk=1
 
 >[!Tip]
 >**DENSE_RANK** is used instead of **RANK**, so that if customers purchased different items on their first visit, we would get the all that was purchased on that day.
->
+
 ***
-
-
 
 > 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
 ````sql
@@ -140,6 +138,19 @@ USING(product_id)
 WHERE drk=1
 ````
 
+#### Steps:
+- Use **COUNT** to compute `num_of_time_purchased` and group the aggregated results by `sales.product_id`. 
+- Use **DENSE_RANK** to determine item most purchased
+- Wrap the above query with brackets and make it a Sub-query, alias it **a**.
+- In the outer query, **SELECT** `product_name` and `num_of_time_purchased`.
+- Use **WHERE** to filter **drk=1** to obtain only the most purchased product(s).
+
+#### Answer:
+|  product_name | num_of_time_purchased | 
+| ----------- | ----------- |
+| ramen       | 8 |
+
+***
 
 > 5. Which item was the most popular for each customer?
 ````sql
@@ -152,7 +163,6 @@ SELECT
 FROM dannys_diner.sales
 GROUP BY 1,2)
 
-
 SELECT 
     p.customer_id, 
     m.product_name,
@@ -164,7 +174,23 @@ WHERE drk=1
 ORDER BY 1,2
 ````
 
+#### Steps:
+- Create a **CTE** (Common Table Expression) name `popular_item`.
+- Within the CTE, use **Count** to compute `num_of_times_ordered` and group the aggregated results by `sales.customer_id` and `sales.product_id`. 
+- Use **DENSE_RANK** to determine items most purchased.
+- In the outer query, use **JOIN** to merge `popular_item` and `dannys_diner.menu` to get `product_name`
+- Use **WHERE** to filter **drk=1** to obtain only the most purchased product(s) for each customer.
 
+#### Answer:
+| customer_id | product_name | order_count |
+| ----------- | ---------- |------------  |
+| A           | ramen        |  3   |
+| B           | sushi        |  2   |
+| B           | curry        |  2   |
+| B           | ramen        |  2   |
+| C           | ramen        |  3   |
+
+- Ohhhh.. seems like everyone loves ramen, and Customer B appears to be in love with everything that Danny serve
 
 
 > 6. Which item was purchased first by the customer after they became a member?
