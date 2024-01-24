@@ -145,7 +145,7 @@ WHERE drk=1
 
 ````sql
 SELECT 
-	s.customer_id,
+    s.customer_id,
     COUNT(*) total_items_ordered,
     SUM(m.price) total_amount_spent
 FROM dannys_diner.sales s
@@ -158,4 +158,17 @@ ORDER BY 1
 
 
 -- 9.  If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
+
+````sql
+SELECT
+    s.customer_id,
+    SUM(CASE WHEN m.product_name='sushi' THEN 20 ELSE 10 END) as points
+FROM dannys_diner.sales s
+JOIN dannys_diner.members mem USING(customer_id)
+JOIN dannys_diner.menu m USING(product_id)
+WHERE s.order_date>=mem.join_date
+GROUP BY 1
+
+````
+
 -- 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
