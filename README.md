@@ -190,6 +190,8 @@ ORDER BY 1,2
 | B           | ramen        |  2   |
 | C           | ramen        |  3   |
 
+***
+
 > 6. Which item was purchased first by the customer after they became a member?
 
 ````sql
@@ -224,6 +226,7 @@ WHERE drk=1
 | A           | ramen        |
 | B           | sushi        |
 
+***
 
 > 7. Which item was purchased just before the customer became a member?
 
