@@ -27,7 +27,7 @@ Through these insights, Danny aims to forge deeper connects with his customers a
 ## Question and Solution
 
 > 1. What is the total amount each customer spent at the restaurant?
-
+<br>
 
 ````sql
 SELECT 
@@ -52,9 +52,14 @@ ORDER BY 2 DESC
 | B           | 74          |
 | C           | 36          |
 
+<br>
+
 ***
 
+<br>
+
 > 2. How many days has each customer visited the restaurant?
+<br>
 
 ````sql
 SELECT
@@ -77,12 +82,17 @@ ORDER BY 2 DESC
 | A           | 4          |
 | C           | 2          |
 
+<br>
+<br>
+
 >[!NOTE]
 >I've seen solutions that reached the same result without converting `order_date` to Date format. It would also work because all time values are set to 0 in the data, I chose to add the extra step to be more careful to avoid unexpectedly double same day visit more than once.
 
 ***
+<br>
 
 > 3. What was the first item from the menu purchased by each customer?
+<br>
 
 ````sql
 SELECT DISTINCT
@@ -115,13 +125,18 @@ WHERE drk=1
 | B           | curry        | 
 | C           | ramen        |
 
+<br>
+<br>
 
 >[!Tip]
 >**DENSE_RANK** is used instead of **RANK**, so that if customers purchased different items on their first visit, we would get the all that was purchased on that day.
 
 ***
+<br>
 
 > 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
+<br>
+
 ````sql
 SELECT 
       product_name,
@@ -140,7 +155,7 @@ WHERE drk=1
 
 #### Steps:
 - Use **COUNT** to compute `num_of_time_purchased` and group the aggregated results by `sales.product_id`. 
-- Use **DENSE_RANK** to determine item most purchased
+- Use **DENSE_RANK** to determine item most purchased.
 - Wrap the above query with brackets and make it a Sub-query, alias it **a**.
 - In the outer query, **SELECT** `product_name` and `num_of_time_purchased`.
 - Use **WHERE** to filter **drk=1** to obtain only the most purchased product(s).
@@ -153,6 +168,8 @@ WHERE drk=1
 ***
 
 > 5. Which item was the most popular for each customer?
+<br>
+
 ````sql
 WITH popular_item AS (
 SELECT
@@ -191,8 +208,11 @@ ORDER BY 1,2
 | C           | ramen        |  3   |
 
 ***
+<br>
 
 > 6. Which item was purchased first by the customer after they became a member?
+
+<br>
 
 ````sql
 WITH item_first_order AS (
@@ -227,8 +247,11 @@ WHERE drk=1
 | B           | sushi        |
 
 ***
+<br>
 
 > 7. Which item was purchased just before the customer became a member?
+
+<br>
 
 ````sql
 WITH item_ordered_before_membership AS (
@@ -265,9 +288,11 @@ WHERE drk=1
 | B           | 2021-01-04T00:00:00.000Z | sushi        |
 
 ***
-
+<br>
 
 > 8. What is the total items and amount spent for each member before they became a member?
+
+<br>
 
 ````sql
 SELECT 
@@ -282,8 +307,24 @@ GROUP BY 1
 ORDER BY 1
 ````
 
+#### Steps:
+- Use **JOIN** to merge `dannys_diner.members`, `dannys_diner.sales` and `dannys_diner.menu` to get all the required fields.
+- Use **COUNT** to compute `total_items_ordered` and group the aggregated results by `sales.customer_id`. 
+- filter **s.order_date<mem.join_date** to get only the item(s) purchased by the customer just before became a member.
+
+
+#### Answer:
+| customer_id | total_items_ordered | total_amount_spent |
+| ----------- | ------------------- | ------------------ |
+| A           | 2                   | 25                 |
+| B           | 3                   | 40                 |
+
+***
+<br>
+
 
 > 9.  If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
+<br>
 
 ````sql
 SELECT
@@ -296,7 +337,25 @@ ORDER BY 1
 
 ````
 
+#### Steps:
+- Use **JOIN** to merge `dannys_diner.sales` and `dannys_diner.menu` to get all the required fields.
+- Use conditional **CASE** statement to calculate points given if customers purchased sushi or any other items.
+- Use **SUM** to compute `points` and group the aggregated results by `sales.customer_id`. 
+
+#### Answer:
+| customer_id | points |
+| ----------- | ------ |
+| A           | 860    |
+| B           | 940    |
+| C           | 360    |
+
+***
+<br>
+
+
 > 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
+<br>
+
 ````sql
 SELECT 
     s.customer_id,
