@@ -195,7 +195,7 @@ ORDER BY 1,2
 - Create a **CTE** (Common Table Expression) name `popular_item`.
 - Within the CTE, use **Count** to compute `num_of_times_ordered` and group the aggregated results by `sales.customer_id` and `sales.product_id`. 
 - Use **DENSE_RANK** to determine items most purchased.
-- In the outer query, use **JOIN** to merge `popular_item` and `dannys_diner.menu` to get `product_name`
+- In the outer query, use **JOIN** to merge `popular_item` and `dannys_diner.menu` to get `product_name`.
 - Use **WHERE** to filter **drk=1** to obtain only the most purchased product(s) for each customer.
 
 #### Answer:
@@ -256,7 +256,7 @@ WHERE drk=1
 ````sql
 WITH item_ordered_before_membership AS (
 SELECT 
-	mem.*,
+    mem.*,
     s.order_date,
     s.product_id,
     m.product_name,
@@ -310,7 +310,7 @@ ORDER BY 1
 #### Steps:
 - Use **JOIN** to merge `dannys_diner.members`, `dannys_diner.sales` and `dannys_diner.menu` to get all the required fields.
 - Use **COUNT** to compute `total_items_ordered` and group the aggregated results by `sales.customer_id`. 
-- filter **s.order_date<mem.join_date** to get only the item(s) purchased by the customer just before became a member.
+- Use **WHERE** to filter **s.order_date<mem.join_date** to get only the item(s) purchased by the customer just before became a member.
 
 
 #### Answer:
@@ -372,3 +372,16 @@ WHERE s.order_date<'2021-02-01'
 GROUP BY 1
 ORDER BY 1
 ````
+#### Steps:
+- Use **LEFT JOIN** to merge `dannys_diner.sales`, `dannys_diner.menu` and `dannys_diner.members` to get all the required fields.
+- Use conditional **CASE** statement to calculate points given depending when order was made and the item purchased.
+- Use **SUM** to compute `points` and group the aggregated results by `sales.customer_id`.
+- Use **WHERE** and **AND** to filter **s.order_date<'2021-02-01'** to only include order made up till 2021-01-31 and filter only Customer A and Customer B.
+
+#### Answer:
+| customer_id | points_earned_by_end_jan |
+| ----------- | ------------------------ |
+| A           | 1370                     |
+| B           | 820                      |
+
+***
