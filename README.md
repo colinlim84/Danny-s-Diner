@@ -162,13 +162,28 @@ ORDER BY 1
 ````sql
 SELECT
     s.customer_id,
-    SUM(CASE WHEN m.product_name='sushi' THEN 20 ELSE 10 END) as points
+    SUM(CASE WHEN m.product_name='sushi' THEN m.price*20 ELSE m.price*10 END) as points
 FROM dannys_diner.sales s
-JOIN dannys_diner.members mem USING(customer_id)
 JOIN dannys_diner.menu m USING(product_id)
-WHERE s.order_date>=mem.join_date
 GROUP BY 1
+ORDER BY 1
 
 ````
 
 -- 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
+````sql
+SELECT 
+    s.customer_id,
+    SUM(CASE 
+        WHEN s.order_date>=mem.join_date AND s.order_date<=mem.join_date+6 THEN m.price*20
+    	WHEN m.product_name='sushi' THEN m.price*20
+        WHEN m.product_name!='sushi' THEN m.price*10
+    END) points_earned_by_end_jan       
+FROM dannys_diner.sales s
+LEFT JOIN dannys_diner.menu m USING(product_id)
+LEFT JOIN dannys_diner.members mem USING(customer_id)
+WHERE s.order_date<'2021-02-01'
+	AND customer_id in ('A','B')
+GROUP BY 1
+ORDER BY 1
+````
