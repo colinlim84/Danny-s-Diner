@@ -41,8 +41,8 @@ ORDER BY 2 DESC
 ````
 
 #### Steps:
-- Use **JOIN** to merge `dannys_diner.sales` and `dannys_diner.menu` tables as `sales.customer_id` and `menu.price` are from both tables.
-- Use **SUM** to calculate the total sales contributed by each customer.
+- Use **JOIN** to merge `dannys_diner.sales` and `dannys_diner.menu` tables as the required information `sales.customer_id` and `menu.price` are from both tables.
+- Use **SUM** to compute `total amount spent`.
 - Group the aggregated results by `sales.customer_id`. 
 
 #### Answer:
@@ -52,8 +52,7 @@ ORDER BY 2 DESC
 | B           | 74          |
 | C           | 36          |
 
-
-
+***
 
 > 2. How many days has each customer visited the restaurant?
 
